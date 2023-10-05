@@ -8,7 +8,7 @@ import {nanoid} from "nanoid";
 export default function App() {
 
     const [notes, setNotes] = React.useState( () => JSON.parse(localStorage.getItem("notes")) || []);
-    
+    console.log(notes);
     const [currentNoteId, setCurrentNoteId] = React.useState(
         (notes[0] && notes[0].id) || ""
     )
@@ -28,11 +28,20 @@ export default function App() {
     }
     
     function updateNote(text) {
-        setNotes(oldNotes => oldNotes.map(oldNote => {
-            return oldNote.id === currentNoteId
-                ? { ...oldNote, body: text }
-                : oldNote
-        }))
+      //Rearrange the most recently-modified note at the top
+        setNotes(oldNotes => {
+          const reorderedNotes = [];
+          for (let i = 0; i < oldNotes.length; i++) {
+            const note = oldNotes[i];
+            if(note.id === currentNoteId){
+              reorderedNotes.unshift({...note, body: text});
+            } else {
+              reorderedNotes.push(note);
+            }
+          }
+
+          return reorderedNotes;
+        })
     }
     
     function findCurrentNote() {
